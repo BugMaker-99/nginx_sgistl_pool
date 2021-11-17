@@ -1,0 +1,2 @@
+# nginx_sgistl_pool
+提取nginx以及SGI STL部分源码自己编写的空间配置器
