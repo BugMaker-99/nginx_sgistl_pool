@@ -13,6 +13,7 @@ int main() {
 	for (int i = 0; i < 20; i++) {
 		int val = rand() % 100;
 		cout << val << " ";
+		// push_back的同时，容器也会扩容，VS是1.5倍传入allocate的参数是1、2、3、4、6、9、13、19、28
 		vec.push_back(val);
 	}
 	cout << endl;
