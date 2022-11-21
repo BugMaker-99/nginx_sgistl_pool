@@ -4,24 +4,19 @@
 using namespace std;
 
 int main() {
-	// ÈÝÆ÷³õÊ¼»¯µÄÊ±ºò»áµ÷ÓÃallocate»áÉêÇë¿Õ¼ä³õÊ¼»¯ÄÚ´æ³Ø
-	// ´«ÈëallocatorµÄ²ÎÊý__nÎª1£¬Ó¦¸ÃÊÇÉêÇëÒ»¸öÔªËØµÄ¿Õ¼ä£¬³¢ÊÔ³õÊ¼»¯ÄÚ´æ³Ø
+	// å®¹å™¨åˆå§‹åŒ–çš„æ—¶å€™ä¼šè°ƒç”¨allocateä¼šç”³è¯·ç©ºé—´åˆå§‹åŒ–å†…å­˜æ± 
+	// ä¼ å…¥allocatorçš„å‚æ•°__nä¸º1ï¼Œåº”è¯¥æ˜¯ç”³è¯·ä¸€ä¸ªå…ƒç´ çš„ç©ºé—´
 
-	// ³õÊ¼»¯Íê³Éºó»áÔÙ´Îµ÷ÓÃallocate£¬´«ÈëµÄ²ÎÊý__n¾ÍÊÇÎÒÃÇÕâÀïÊÖ¶¯´«ÈëµÄ10
-	
-	// ÀïÃæstatic _S_free_list[]µÄµØÖ·»á¸Ä±ä£¬²»Ã÷°×ÎªÊ²Ã´¡£
-	// ¾Í±ÈÈç³õÊ¼»¯vectorµÄÊ±ºò´«ÈëallocateµÄ__nÎª1ÒÔ¼°´«ÈëallocateÎªÎÒÃÇÊÖ¶¯ÉèÖÃµÄ10Ê±£¬_S_free_listµÄµØÖ·²»Ò»Ñù
-
-	// È»ºópush_backµÄÊ±ºò¾Í»áÒ»Ö±Ê¹ÓÃºóÃæµÄÕâ¸ö_S_free_listµÄµØÖ·
-	// µÚÒ»´Îpush_backµÄÊ±ºò»á¿ª±ÙÒ»¶¨µÄ¿Õ¼ä£¬È»ºóÔÙ¹¹Ôì¶ÔÏó£¬ºóÃæpush_backµÄÊ±ºòÈô¿Õ¼ä¹»ÓÃ¾Í²»»áÔÙ¿ª±Ù¿Õ¼ä£¬¶øÖ±½Ó¹¹Ôì¶ÔÏó
-	vector<int, SGIAllocator<int>> vec(10);
+	// ç¬¬ä¸€æ¬¡push_backçš„æ—¶å€™ä¼šå¼€è¾Ÿä¸€å®šçš„ç©ºé—´ï¼Œç„¶åŽå†æž„é€ å¯¹è±¡ï¼ŒåŽé¢push_backçš„æ—¶å€™è‹¥ç©ºé—´å¤Ÿç”¨å°±ä¸ä¼šå†å¼€è¾Ÿç©ºé—´ï¼Œè€Œç›´æŽ¥æž„é€ å¯¹è±¡
+	// è‹¥ç©ºé—´ä¸å¤Ÿç”¨ï¼Œåˆ™é‡æ–°ç”³è¯·å†…å­˜ç©ºé—´ï¼Œå†åˆ°æ–°ç©ºé—´åšå®šä½newï¼Œå°†æ•°æ®æ‹·è´åˆ°æ–°ç©ºé—´ï¼Œç„¶åŽè°ƒç”¨deallocateå½’è¿˜chunkå—
+	vector<int, SGIAllocator<int>> vec;
 	for (int i = 0; i < 20; i++) {
 		int val = rand() % 100;
 		cout << val << " ";
 		vec.push_back(val);
 	}
 	cout << endl;
-	for (int i = 10; i < 30; i++) {
+	for (int i = 0; i < 20; i++) {
 		cout << vec[i] << " ";
 	}
 	cout << endl;
