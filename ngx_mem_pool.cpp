@@ -171,9 +171,12 @@ void* NgxMemPool::ngx_palloc_large(size_t size) {
         free(p);
         return nullptr;
     }
-
-    large->alloc = p;
-    large->next = pool_->large;
+    cout << "large->alloc : " <<  large->alloc << endl;
+    cout << "p : " << p << endl;
+    large->alloc = p;              // 大块内存
+    cout << "large->next : " << large->next << endl;
+    large->next = pool_->large;    // 头插法
+    cout << "pool_->large : " << pool_->large << endl;
     pool_->large = large;
 
     return p;

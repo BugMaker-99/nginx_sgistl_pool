@@ -18,7 +18,7 @@ void func2(void* fp) {
     fclose(fp_);
 }
 
-int main_nginx() {
+int main() {
     // max = 512 - sizeof(ngx_pool_t)
     // 创建总空间为512字节的nginx内存块
     NgxMemPool pool(512);

@@ -10,7 +10,7 @@ using namespace std;
 
 // 类型重定义
 using u_char = unsigned char;
-using ngx_uint_t = unsigned int;
+using ngx_uint_t = unsigned long; // 64位Linux，指针占8个字节，int占四个字节
 
 // 销毁内存池前调用的函数，一般用于清理外部资源
 typedef void (*ngx_pool_cleanup_pt)(void* data);
@@ -48,7 +48,7 @@ struct ngx_pool_s {
 
 // 数值n调整为align的倍数
 #define ngx_align(n, align)  (((n) + (align - 1)) & ~(align - 1))
-// 指针p调整到align整数倍的地址
+// 指针p调整到align整数倍的地址，在64位linux下，p是指针类型，占8字节，若ngx_uint_t为int，只占4字节，强转时会发生数据截断，再访问该地址会发生Segmentation fault
 #define ngx_align_ptr(p, align)  (u_char *) (((ngx_uint_t) (p) + ((ngx_uint_t) align - 1)) & ~((ngx_uint_t) align - 1))
 
 
