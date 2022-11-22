@@ -5,7 +5,7 @@
 
 
 
-// ·â×°ÁËmallocºÍfree£¬¿ÉÒÔÉèÖÃOOMÊÍ·ÅÄÚ´æµÄ»Øµ÷º¯Êı
+// å°è£…äº†mallocå’Œfreeï¼Œå¯ä»¥è®¾ç½®OOMé‡Šæ”¾å†…å­˜çš„å›è°ƒå‡½æ•°
 template <int __inst>
 class __malloc_alloc_template {
 private:
@@ -79,41 +79,41 @@ typedef __malloc_alloc_template<0> malloc_alloc;
 template<typename T>
 class SGIAllocator {
 private:
-	enum { _ALIGN = 8 };          // ×ÔÓÉÁ´±í´Ó8×Ö½Ú¿ªÊ¼£¬ÒÔ8×Ö½Ú¶ÔÆë£¬Ò»Ö±À©³äµ½128
-	enum { _MAX_BYTES = 128 };    // ÄÚ´æ³Ø×î´óµÄchunk¿é
-	enum { _NFREELISTS = 16 };    // ×ÔÓÉÁ´±íµÄ½Úµã¸öÊı
+	enum { _ALIGN = 8 };          // è‡ªç”±é“¾è¡¨ä»8å­—èŠ‚å¼€å§‹ï¼Œä»¥8å­—èŠ‚å¯¹é½ï¼Œä¸€ç›´æ‰©å……åˆ°128
+	enum { _MAX_BYTES = 128 };    // å†…å­˜æ± æœ€å¤§çš„chunkå—
+	enum { _NFREELISTS = 16 };    // è‡ªç”±é“¾è¡¨çš„èŠ‚ç‚¹ä¸ªæ•°
 
-	// ¼ÇÂ¼ÄÚ´æ¿éµÄ·ÖÅä×´Ì¬£¬Chunk allocation state.
-	// _S_start_free¡¢_S_end_free·Ö±ğ¼ÇÂ¼ÄÚ´æ³Ø¿É·ÖÅä¿Õ¼äµÄÆğÊ¼ºÍÄ©Î²µØÖ·
+	// è®°å½•å†…å­˜å—çš„åˆ†é…çŠ¶æ€ï¼ŒChunk allocation state.
+	// _S_start_freeã€_S_end_freeåˆ†åˆ«è®°å½•å†…å­˜æ± å¯åˆ†é…ç©ºé—´çš„èµ·å§‹å’Œæœ«å°¾åœ°å€
 	static char* _S_start_free;
 	static char* _S_end_free;
 	static size_t _S_heap_size;
 
-	// Ã¿Ò»¸öchunk¿éµÄÍ·ĞÅÏ¢£¬_M_free_list_linkÊÇÏÂÒ»¸öchunk¿éµÄµØÖ·
+	// æ¯ä¸€ä¸ªchunkå—çš„å¤´ä¿¡æ¯ï¼Œ_M_free_list_linkæ˜¯ä¸‹ä¸€ä¸ªchunkå—çš„åœ°å€
 	union _Obj {
 		union _Obj* _M_free_list_link;
 		char _M_client_data[1];    /* The client sees this. */
 	};
 
-	// ×ÔÓÉÁ´±í
+	// è‡ªç”±é“¾è¡¨
 	static _Obj* volatile _S_free_list[_NFREELISTS];
 
-	// ÄÚ´æ³Ø»ùÓÚfreelistÊµÏÖ£¬ĞèÒª¿¼ÂÇÏß³Ì°²È«
+	// å†…å­˜æ± åŸºäºfreelistå®ç°ï¼Œéœ€è¦è€ƒè™‘çº¿ç¨‹å®‰å…¨
 	static std::mutex mtx;
 
-	// °Ñ__bytesµÄ´óĞ¡ÉÏµ÷ÖÁ8µÄÕûÊı±¶·µ»Ø
+	// æŠŠ__bytesçš„å¤§å°ä¸Šè°ƒè‡³8çš„æ•´æ•°å€è¿”å›
 	static size_t _S_round_up(size_t __bytes) {
 		return (((__bytes)+(size_t)_ALIGN - 1) & ~((size_t)_ALIGN - 1));
 	}
 
-	// ·µ»Ø __bytes ´óĞ¡µÄchunk¿éÎ»ÓÚ free-list ÖĞµÄ±àºÅ
+	// è¿”å› __bytes å¤§å°çš„chunkå—ä½äº free-list ä¸­çš„ç¼–å·
 	static size_t _S_freelist_index(size_t __bytes) {
 		return (((__bytes)+(size_t)_ALIGN - 1) / (size_t)_ALIGN - 1);
 	}
 
 
 
-	// ÌîĞ´Ã¿¸öchunk¿éµÄµØÖ·Óò
+	// å¡«å†™æ¯ä¸ªchunkå—çš„åœ°å€åŸŸ
 	static void* _S_refill(size_t __n) {
 		int __nobjs = 20;
 
@@ -208,9 +208,9 @@ public:
 	template <class _Other>
 	constexpr SGIAllocator(const SGIAllocator<_Other>&) noexcept {}
 
-	// ¿ª±Ùchunk¿é
+	// å¼€è¾Ÿchunkå—
 	T* allocate(size_t __n) {
-		// ÕâÀïµ×²ã¿ª±Ù¿Õ¼ä£¬µ÷ÓÃallocate´«ÈëµÄÊÇÔªËØµÄÊıÁ¿£¬¶ø²»ÊÇ×Ö½ÚÊı
+		// è¿™é‡Œåº•å±‚å¼€è¾Ÿç©ºé—´ï¼Œè°ƒç”¨allocateä¼ å…¥çš„æ˜¯å…ƒç´ çš„æ•°é‡ï¼Œè€Œä¸æ˜¯å­—èŠ‚æ•°
 		__n *= sizeof(T);
 		void* __ret = 0;
 
@@ -220,7 +220,7 @@ public:
 		else {
 			_Obj* volatile* __my_free_list = _S_free_list + _S_freelist_index(__n);
 
-			// ³ö×÷ÓÃÓò×Ô¶¯Îö¹¹½âËø
+			// å‡ºä½œç”¨åŸŸè‡ªåŠ¨ææ„è§£é”
 			std::lock_guard<std::mutex> guard(mtx);
 
 			_Obj* __result = *__my_free_list;
@@ -235,7 +235,7 @@ public:
 		return (T*)__ret;
 	}
 
-	// ¹é»¹chunk¿é
+	// å½’è¿˜chunkå—
 	void deallocate(void* __p, size_t __n) {
 		if (__n > (size_t)_MAX_BYTES)
 			malloc_alloc::deallocate(__p, __n);
@@ -250,7 +250,7 @@ public:
 			*__my_free_list = __q;
 		}
 	}
-	// À©Èİ and ËõÈİ
+	// æ‰©å®¹ and ç¼©å®¹
 	static void* reallocate(void* __p, size_t __old_sz, size_t __new_sz) {
 		void* __result;
 		size_t __copy_sz;
@@ -265,11 +265,11 @@ public:
 		deallocate(__p, __old_sz);
 		return(__result);
 	}
-	// ¶ÔÏó¹¹Ôì
+	// å¯¹è±¡æ„é€ 
 	void construct(T* __p, const T& __val) {
 		new (__p) T(__val);
 	}
-	// ¶ÒÏÖÎö¹¹
+	// å…‘ç°ææ„
 	void destroy(T* __p) {
 		__p->~T();
 	}
@@ -287,7 +287,7 @@ size_t SGIAllocator<T>::_S_heap_size = 0;
 
 
 template <typename T>
-// typename¸æËß±àÒëÆ÷_ObjÊÇÀàĞÍ¶¨Òå
+// typenameå‘Šè¯‰ç¼–è¯‘å™¨_Objæ˜¯ç±»å‹å®šä¹‰
 typename SGIAllocator<T>::_Obj* volatile SGIAllocator<T>::_S_free_list[_NFREELISTS] = {
 	nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,
 	nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr

@@ -20,10 +20,10 @@ void func2(void* fp) {
 
 int main_nginx() {
     // max = 512 - sizeof(ngx_pool_t)
-    // ´´½¨×Ü¿Õ¼äÎª512×Ö½ÚµÄnginxÄÚ´æ¿é
+    // åˆ›å»ºæ€»ç©ºé—´ä¸º512å­—èŠ‚çš„nginxå†…å­˜å—
     NgxMemPool pool(512);
 
-    // ´ÓĞ¡¿éÄÚ´æ³Ø·ÖÅäµÄ
+    // ä»å°å—å†…å­˜æ± åˆ†é…çš„
     void* p1 = pool.ngx_palloc(128);
 
     if (p1 == nullptr) {
@@ -31,22 +31,22 @@ int main_nginx() {
         return -1;
     }
 
-    // ´Ó´ó¿éÄÚ´æ³Ø·ÖÅäµÄ
+    // ä»å¤§å—å†…å­˜æ± åˆ†é…çš„
     stData* p2 = (stData*)pool.ngx_palloc(512);
     if (p2 == nullptr) {
         cout << "ngx_palloc 512 bytes fail..."<<endl;
         return -1;
     }
 
-    // Õ¼ÓÃÍâ²¿¶ÑÄÚ´æ
+    // å ç”¨å¤–éƒ¨å †å†…å­˜
     p2->ptr = (char*)malloc(12);
     strcpy(p2->ptr, "hello world");
-    // ÎÄ¼şÃèÊö·û
+    // æ–‡ä»¶æè¿°ç¬¦
     p2->pfile = fopen("data.txt", "w");
 
     ngx_pool_cleanup_s* c1 = pool.ngx_pool_cleanup_add(sizeof(char*));
-    c1->handler = func1;   // ÉèÖÃ»Øµ÷º¯Êı
-    c1->data = p2->ptr;    // ÉèÖÃ×ÊÔ´µØÖ·
+    c1->handler = func1;   // è®¾ç½®å›è°ƒå‡½æ•°
+    c1->data = p2->ptr;    // è®¾ç½®èµ„æºåœ°å€
 
     ngx_pool_cleanup_s* c2 = pool.ngx_pool_cleanup_add(sizeof(FILE*));
     c2->handler = func2;

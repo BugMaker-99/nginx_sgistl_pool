@@ -1,4 +1,6 @@
-#pragma once
+#ifndef NGX_MEM_POOL
+#define NGX_MEM_POOL
+
 #include <iostream>
 #include <stdlib.h>
 #include <memory.h>
@@ -6,88 +8,90 @@
 
 using namespace std;
 
-// ÀàĞÍÖØ¶¨Òå
+// ç±»å‹é‡å®šä¹‰
 using u_char = unsigned char;
 using ngx_uint_t = unsigned int;
 
-// Ïú»ÙÄÚ´æ³ØÇ°µ÷ÓÃµÄº¯Êı£¬Ò»°ãÓÃÓÚÇåÀíÍâ²¿×ÊÔ´
+// é”€æ¯å†…å­˜æ± å‰è°ƒç”¨çš„å‡½æ•°ï¼Œä¸€èˆ¬ç”¨äºæ¸…ç†å¤–éƒ¨èµ„æº
 typedef void (*ngx_pool_cleanup_pt)(void* data);
 
 struct ngx_pool_cleanup_s {
-    ngx_pool_cleanup_pt       handler;   // º¯ÊıÖ¸Õë£¬±£´æÇåÀíº¯ÊıµÄµØÖ·
-    void                      *data;     // Ö¸ÏòĞèÒªÊÍ·ÅµÄ×ÊÔ´
-    ngx_pool_cleanup_s        *next;     // ÊÍ·Å×ÊÔ´µÄº¯Êı¶¼·ÅÔÚÒ»¸öÁ´±í£¬ÓÃnextÖ¸ÏòÕâ¸öÁ´±í
+    ngx_pool_cleanup_pt       handler;   // å‡½æ•°æŒ‡é’ˆï¼Œä¿å­˜æ¸…ç†å‡½æ•°çš„åœ°å€
+    void                      *data;     // æŒ‡å‘éœ€è¦é‡Šæ”¾çš„èµ„æº
+    ngx_pool_cleanup_s        *next;     // é‡Šæ”¾èµ„æºçš„å‡½æ•°éƒ½æ”¾åœ¨ä¸€ä¸ªé“¾è¡¨ï¼Œç”¨nextæŒ‡å‘è¿™ä¸ªé“¾è¡¨
 };
 
-// ´ó¿éÄÚ´æµÄÍ·²¿ĞÅÏ¢
+// å¤§å—å†…å­˜çš„å¤´éƒ¨ä¿¡æ¯
 struct ngx_pool_large_s {
     ngx_pool_large_s   *next;
     void               *alloc;
 };
 
-// ÀàĞÍÉùÃ÷
+// ç±»å‹å£°æ˜
 struct ngx_pool_s;
-// nginxÍ·²¿ĞÅÏ¢
+// nginxå¤´éƒ¨ä¿¡æ¯
 struct ngx_pool_data_s {
-    u_char            *last;         // Ö¸Ïò¿ÉÓÃÄÚ´æµÄÆğÊ¼µØÖ·
-    u_char            *end;          // Ö¸Ïò¿ÉÓÃÄÚ´æµÄÄ©Î²µØÖ·
-    ngx_pool_s        *next;         // Ö¸ÏòÏÂÒ»¸öÄÚ´æ¿é 
-    ngx_uint_t        failed;        // µ±Ç°ÄÚ´æ¿é·ÖÅä¿Õ¼äÊ§°ÜµÄ´ÎÊı
+    u_char            *last;         // æŒ‡å‘å¯ç”¨å†…å­˜çš„èµ·å§‹åœ°å€
+    u_char            *end;          // æŒ‡å‘å¯ç”¨å†…å­˜çš„æœ«å°¾åœ°å€
+    ngx_pool_s        *next;         // æŒ‡å‘ä¸‹ä¸€ä¸ªå†…å­˜å— 
+    ngx_uint_t        failed;        // å½“å‰å†…å­˜å—åˆ†é…ç©ºé—´å¤±è´¥çš„æ¬¡æ•°
 };
 
-// nginxÍ·²¿ĞÅÏ¢ºÍ¹ÜÀí³ÉÔ±ĞÅÏ¢
+// nginxå¤´éƒ¨ä¿¡æ¯å’Œç®¡ç†æˆå‘˜ä¿¡æ¯
 struct ngx_pool_s {
-    ngx_pool_data_s        d;
-    size_t                 max;
-    ngx_pool_s             *current;  // Ö¸Ïò¿ÉÓÃÓÚ·ÖÅä¿Õ¼äµÄµÚÒ»¸öÄÚ´æ¿é£¨failed < 4£©µÄÆğÊ¼µØÖ·
-    ngx_pool_large_s       *large;    // Ö¸Ïò´ó¿éÄÚ´æ£¨Á´±í£©µÄÈë¿ÚµØÖ·
-    ngx_pool_cleanup_s     *cleanup;  // Ö¸ÏòËùÓĞÔ¤ÖÃµÄÇåÀíº¯Êı£¨Á´±í£©µÄÈë¿Ú
+    ngx_pool_data_s        d;         // ngx_pool_data_så¤´ä¿¡æ¯
+    size_t                 max;       // å°å—å†…å­˜å’Œå¤§å—å†…å­˜çš„åˆ†ç•Œçº¿
+    ngx_pool_s             *current;  // æŒ‡å‘å¯ç”¨äºåˆ†é…ç©ºé—´çš„ç¬¬ä¸€ä¸ªå†…å­˜å—ï¼ˆfailed < 4ï¼‰çš„èµ·å§‹åœ°å€
+    ngx_pool_large_s       *large;    // æŒ‡å‘å¤§å—å†…å­˜ï¼ˆé“¾è¡¨ï¼‰çš„å…¥å£åœ°å€
+    ngx_pool_cleanup_s     *cleanup;  // æŒ‡å‘æ‰€æœ‰é¢„ç½®çš„æ¸…ç†å‡½æ•°ï¼ˆé“¾è¡¨ï¼‰çš„å…¥å£
 };
 
-// ÊıÖµnµ÷ÕûÎªalignµÄ±¶Êı
+// æ•°å€¼nè°ƒæ•´ä¸ºalignçš„å€æ•°
 #define ngx_align(n, align)  (((n) + (align - 1)) & ~(align - 1))
-// Ö¸Õëpµ÷Õûµ½alignÕûÊı±¶µÄµØÖ·
+// æŒ‡é’ˆpè°ƒæ•´åˆ°alignæ•´æ•°å€çš„åœ°å€
 #define ngx_align_ptr(p, align)  (u_char *) (((ngx_uint_t) (p) + ((ngx_uint_t) align - 1)) & ~((ngx_uint_t) align - 1))
 
 
-// Ä¬ÈÏÒ»¸öÎïÀíÒ³ÃæµÄ´óĞ¡
+// é»˜è®¤ä¸€ä¸ªç‰©ç†é¡µé¢çš„å¤§å°
 const int ngx_pagesize = 4096;
-// Ğ¡¿éÄÚ´æ³ØÔÊĞí·ÖÅäµÄ×î´ó¿Õ¼ä
+// å°å—å†…å­˜æ± å…è®¸åˆ†é…çš„æœ€å¤§ç©ºé—´
 const int NGX_MAX_ALLOC_FROM_POOL = ngx_pagesize - 1;
 const int NGX_DEFAULT_POOL_SIZE = 16 * 1024;
-// ÄÚ´æ³Ø¶ÔÆë²ÎÊı
+// å†…å­˜æ± å¯¹é½å‚æ•°
 const int NGX_POOL_ALIGNMENT = 16;
-// ÄÚ´æ³Ø×îĞ¡¿Õ¼ä£º¿ÉÒÔ·ÅÈëÒ»¸öĞ¡¿éÄÚ´æÍ·ĞÅÏ¢ÒÔ¼°Á½¸ö´ó¿éÄÚ´æµÄÍ·ĞÅÏ¢
+// å†…å­˜æ± æœ€å°ç©ºé—´ï¼šå¯ä»¥æ”¾å…¥ä¸€ä¸ªå°å—å†…å­˜å¤´ä¿¡æ¯ä»¥åŠä¸¤ä¸ªå¤§å—å†…å­˜çš„å¤´ä¿¡æ¯
 const int NGX_MIN_POOL_SIZE = ngx_align((sizeof(ngx_pool_s) + 2 * sizeof(ngx_pool_large_s)), NGX_POOL_ALIGNMENT);
-// nginxĞ¡¿éÄÚ´æ·ÖÅäÊ±µÄ¶ÔÆë²ÎÊı
+// nginxå°å—å†…å­˜åˆ†é…æ—¶çš„å¯¹é½å‚æ•°
 const int NGX_ALIGNMENT = sizeof(unsigned long);
 
 class NgxMemPool {
 public:
     NgxMemPool(size_t size);
     ~NgxMemPool();
-    // ´´½¨Ö¸¶¨´óĞ¡µÄÄÚ´æ³Ø
+    // åˆ›å»ºæŒ‡å®šå¤§å°çš„å†…å­˜æ± 
     // bool ngx_create_pool(size_t size);
-    // ¿¼ÂÇ×Ö½ÚÄÚ´æ¶ÔÆë£¬ÏòÄÚ´æ³ØÉêÇësize×Ö½Ú
+    // è€ƒè™‘å­—èŠ‚å†…å­˜å¯¹é½ï¼Œå‘å†…å­˜æ± ç”³è¯·sizeå­—èŠ‚
     void* ngx_palloc(size_t size);
-    // ²»¿¼ÂÇ×Ö½ÚÄÚ´æ¶ÔÆë£¬ÏòÄÚ´æ³ØÉêÇësize×Ö½Ú
+    // ä¸è€ƒè™‘å­—èŠ‚å†…å­˜å¯¹é½ï¼Œå‘å†…å­˜æ± ç”³è¯·sizeå­—èŠ‚
     void* ngx_pnalloc(size_t size);
-    // µ÷ÓÃµÄÊÇngx_palloc£¬ÇÒ»á°ÑÄÚ´æ³õÊ¼»¯Îª0
+    // è°ƒç”¨çš„æ˜¯ngx_pallocï¼Œä¸”ä¼šæŠŠå†…å­˜åˆå§‹åŒ–ä¸º0
     void* ngx_pcalloc(size_t size);
-    // ÊÍ·Å´ó¿éÄÚ´æ
+    // é‡Šæ”¾å¤§å—å†…å­˜
     void ngx_pfree(void* p);
-    // ÖØÖÃÄÚ´æ³Ø£¨ÊÍ·Å´ó¿éÄÚ´æ£¬ÖØÖÃĞ¡¿éÄÚ´æ£©
+    // é‡ç½®å†…å­˜æ± ï¼ˆé‡Šæ”¾å¤§å—å†…å­˜ï¼Œé‡ç½®å°å—å†…å­˜ï¼‰
     void ngx_reset_pool();
-    // Ïú»ÙÄÚ´æ³Ø£¬ÊÍ·ÅËùÓĞµÄ×ÊÔ´
+    // é”€æ¯å†…å­˜æ± ï¼Œé‡Šæ”¾æ‰€æœ‰çš„èµ„æº
     // void ngx_destroy_pool();
-    // Ìí¼ÓÇåÀíµÄ»Øµ÷º¯Êı£¬»áÔÚngx_destroy_poolÖĞµ÷ÓÃ
+    // æ·»åŠ æ¸…ç†çš„å›è°ƒå‡½æ•°ï¼Œä¼šåœ¨ngx_destroy_poolä¸­è°ƒç”¨
     ngx_pool_cleanup_s* ngx_pool_cleanup_add(size_t size);
 private:
     ngx_pool_s* pool_;
-    // Ğ¡¿éÄÚ´æ·ÖÅä
+    // å°å—å†…å­˜åˆ†é…
     void* ngx_palloc_small(size_t size, bool is_align);
-    // ´ó¿éÄÚ´æ·ÖÅä
+    // å¤§å—å†…å­˜åˆ†é…
     void* ngx_palloc_large(size_t size);
-    // µ±Ç°Ğ¡¿éÄÚ´æ³ØµÄ¿é²»¹»Ê±£¬ÖØĞÂ·ÖÅäĞÂµÄĞ¡¿éÄÚ´æ³Ø
+    // å½“å‰å°å—å†…å­˜æ± çš„å‰©ä½™ç©ºé—´ä¸å¤Ÿæ—¶ï¼Œé‡æ–°åˆ†é…æ–°çš„å°å—å†…å­˜æ± 
     void* ngx_palloc_block(size_t size);
 };
+
+#endif

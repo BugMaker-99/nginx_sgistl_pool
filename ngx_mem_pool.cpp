@@ -22,14 +22,14 @@ NgxMemPool::NgxMemPool(size_t size) {
     pool_->cleanup = nullptr;
 }
 
-// 1.µ÷ÓÃËùÓĞµÄÔ¤ÖÃµÄÇåÀíº¯Êı 2.ÊÍ·Å´ó¿éÄÚ´æ 3.ÊÍ·ÅĞ¡¿éÄÚ´æ³ØËùÓĞÄÚ´æ
+// 1.è°ƒç”¨æ‰€æœ‰çš„é¢„ç½®çš„æ¸…ç†å‡½æ•° 2.é‡Šæ”¾å¤§å—å†…å­˜ 3.é‡Šæ”¾å°å—å†…å­˜æ± æ‰€æœ‰å†…å­˜
 NgxMemPool::~NgxMemPool() {
     ngx_pool_s* p, * next_block;
     ngx_pool_large_s* l;
     ngx_pool_cleanup_s* c;
 
-    cout << "¿ªÊ¼Ïú»ÙÄÚ´æ³Ø..." << endl;
-    // ÊÍ·ÅÍâ²¿×ÊÔ´
+    cout << "å¼€å§‹é”€æ¯å†…å­˜æ± ..." << endl;
+    // é‡Šæ”¾å¤–éƒ¨èµ„æº
     for (c = pool_->cleanup; c; c = c->next) {
         if (c->handler) {
             cout << "run cleanup: " << c << endl;;
@@ -37,17 +37,17 @@ NgxMemPool::~NgxMemPool() {
         }
     };
 
-    // ÊÍ·Å´ó¿éÄÚ´æ
+    // é‡Šæ”¾å¤§å—å†…å­˜
     for (l = pool_->large; l; l = l->next) {
         if (l->alloc) {
-            cout << "free ´ó¿éÄÚ´æ:" << l->alloc << endl;
+            cout << "free å¤§å—å†…å­˜:" << l->alloc << endl;
             free(l->alloc);
         }
     }
 
-    // ÊÍ·ÅĞ¡¿éÄÚ´æ
+    // é‡Šæ”¾å°å—å†…å­˜
     for (p = pool_, next_block = pool_->d.next; /* void */; p = next_block, next_block = next_block->d.next) {
-        cout << "free Ğ¡¿éÄÚ´æ :" << p << endl;
+        cout << "free å°å—å†…å­˜ :" << p << endl;
         free(p);
         if (next_block == nullptr) {
             break;
@@ -62,7 +62,7 @@ void* NgxMemPool::ngx_palloc(size_t size){
     return ngx_palloc_large(size);
 }
 
-// ²»¿¼ÂÇ×Ö½ÚÄÚ´æ¶ÔÆë£¬ÏòÄÚ´æ³ØÉêÇësize×Ö½Ú
+// ä¸è€ƒè™‘å­—èŠ‚å†…å­˜å¯¹é½ï¼Œå‘å†…å­˜æ± ç”³è¯·sizeå­—èŠ‚
 void* NgxMemPool::ngx_pnalloc(size_t size) {
     if (size <= pool_->max) {
         return ngx_palloc_small(size, false);
@@ -70,7 +70,7 @@ void* NgxMemPool::ngx_pnalloc(size_t size) {
     return ngx_palloc_large(size);
 }
 
-// µ÷ÓÃµÄÊÇngx_palloc£¬ÇÒ»á°ÑÄÚ´æ³õÊ¼»¯Îª0
+// è°ƒç”¨çš„æ˜¯ngx_pallocï¼Œä¸”ä¼šæŠŠå†…å­˜åˆå§‹åŒ–ä¸º0
 void* NgxMemPool::ngx_pcalloc(size_t size) {
     void   *p;
 
@@ -82,7 +82,7 @@ void* NgxMemPool::ngx_pcalloc(size_t size) {
     return p;
 }
 
-// Ğ¡¿éÄÚ´æ·ÖÅä
+// å°å—å†…å­˜åˆ†é…
 void* NgxMemPool::ngx_palloc_small(size_t size, bool is_align) {
     u_char* m;
     ngx_pool_s* p = pool_->current;
@@ -106,7 +106,7 @@ void* NgxMemPool::ngx_palloc_small(size_t size, bool is_align) {
     return ngx_palloc_block(size);
 }
 
-// µ±Ç°Ğ¡¿éÄÚ´æ³ØµÄ¿é²»¹»Ê±£¬ÖØĞÂ·ÖÅäĞÂµÄĞ¡¿éÄÚ´æ³Ø
+// å½“å‰å°å—å†…å­˜æ± çš„å—ä¸å¤Ÿæ—¶ï¼Œé‡æ–°åˆ†é…æ–°çš„å°å—å†…å­˜æ± 
 void* NgxMemPool::ngx_palloc_block(size_t size) {
     u_char       *m;
     size_t       pool_size;
@@ -141,7 +141,7 @@ void* NgxMemPool::ngx_palloc_block(size_t size) {
     return m;
 }
 
-// ´ó¿éÄÚ´æ·ÖÅä
+// å¤§å—å†…å­˜åˆ†é…
 void* NgxMemPool::ngx_palloc_large(size_t size) {
     void* p;
     ngx_uint_t         n;
@@ -179,12 +179,13 @@ void* NgxMemPool::ngx_palloc_large(size_t size) {
     return p;
 }
 
+// ngx_pfreeä¸“é—¨ç”¨äºé‡Šæ”¾å¤§å—å†…å­˜
 void NgxMemPool::ngx_pfree(void* p) {
     ngx_pool_large_s* l;
 
     for (l = pool_->large; l; l = l->next) {
         if (p == l->alloc) {
-            cout << "free ´ó¿éÄÚ´æ:" << l->alloc << endl;
+            cout << "free å¤§å—å†…å­˜:" << l->alloc << endl;
             free(l->alloc);
             l->alloc = nullptr;
             return;
@@ -192,14 +193,19 @@ void NgxMemPool::ngx_pfree(void* p) {
     }
 }
 
-// ÖØÖÃÄÚ´æ³Ø£¨ÊÍ·Å´ó¿éÄÚ´æ£¬ÖØÖÃĞ¡¿éÄÚ´æ£©
+// é‡ç½®å†…å­˜æ± ï¼ˆé‡Šæ”¾å¤§å—å†…å­˜ï¼Œé‡ç½®å°å—å†…å­˜ï¼‰
 void NgxMemPool::ngx_reset_pool() {
-    
-    ngx_pool_large_s* l;
+    // éå†cleanupé“¾è¡¨ï¼Œé‡Šæ”¾å ç”¨çš„å¤–éƒ¨èµ„æº
+    for (ngx_pool_cleanup_s* c = pool_->cleanup; c; c = c->next) {
+        if (c->handler) {
+            cout << "run cleanup: " << c << endl;;
+            c->handler(c->data);
+        }
+    };
 
-    for (l = pool_->large; l; l = l->next) {
+    for (ngx_pool_large_s* l = pool_->large; l; l = l->next) {
         if (l->alloc) {
-            cout << "free ´ó¿éÄÚ´æ:" << l->alloc << endl;
+            cout << "free å¤§å—å†…å­˜:" << l->alloc << endl;
             free(l->alloc);
         }
     }
@@ -216,10 +222,10 @@ void NgxMemPool::ngx_reset_pool() {
     pool_->large = nullptr;
 }
 
-// Ìí¼ÓÇåÀíµÄ»Øµ÷º¯Êı£¬»áÔÚÎö¹¹º¯ÊıÖĞµ÷ÓÃ
-// size±íÊ¾pool_->cleanup->dataÖ¸ÕëµÄ´óĞ¡
+// æ·»åŠ æ¸…ç†çš„å›è°ƒå‡½æ•°ï¼Œä¼šåœ¨ææ„å‡½æ•°ä¸­è°ƒç”¨
+// sizeè¡¨ç¤ºpool_->cleanup->dataæŒ‡é’ˆçš„å¤§å°
 ngx_pool_cleanup_s* NgxMemPool::ngx_pool_cleanup_add(size_t size) {
-    // ´æ·ÅÇåÀíº¯ÊıĞÅÏ¢µÄ¿é
+    // å­˜æ”¾æ¸…ç†å‡½æ•°ä¿¡æ¯çš„å—
     ngx_pool_cleanup_s* clean_block = (ngx_pool_cleanup_s*)ngx_palloc(sizeof(ngx_pool_cleanup_s));
 
     if (clean_block == nullptr) {
@@ -234,10 +240,10 @@ ngx_pool_cleanup_s* NgxMemPool::ngx_pool_cleanup_add(size_t size) {
     }else {
         clean_block->data = nullptr;
     }
-
     clean_block->handler = nullptr;
-    clean_block->next = pool_->cleanup;
 
+    // å¤´æ’æ³•æ’å…¥clean_block
+    clean_block->next = pool_->cleanup;
     pool_->cleanup = clean_block;
 
     cout<<"add cleanup: " << clean_block << endl;;
